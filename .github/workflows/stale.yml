@@ -4,24 +4,29 @@
 # For more information, see:
 # https://github.com/actions/stale
 name: Mark stale issues and pull requests
+# This workflow sends a message to issues and pull requests that have had no activity for 3 days.
+# It will comment on the issue and pull request with a message and label it as stale.
+# It will then wait another 3 days for activity. If no activity occurs, the stale label will be removed
 
 on:
   schedule:
-  - cron: '0 14 * * *'
-
+    - cron: '0 0 * * *'
+      
 jobs:
-  stale:
-
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
-
-    steps:
-    - uses: actions/stale@v5
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'Stale issue message'
-        stale-pr-message: 'Stale pull request message'
-        stale-issue-label: 'no-issue-activity'
-        stale-pr-label: 'no-pr-activity'
+    stale:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/stale@v3
+          with:
+            repo-token: ${{ secrets.GITHUB_TOKEN }}
+            stale-pr-message: 'This pull request has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Deployment will be cancelled. Thank you for your contributions.'
+            days-before-stale: 1
+            days-before-close: 3
+            stale-pr-label: 'stale'
+            exempt-issue-labels: 'pinned'
+            exempt-pr-labels: 'pinned'
+            operations-per-run: 1000
+            remove-stale-when-updated: true
+            only-labels: 'stale'
+            close-pr-message: 'This pull request has been automatically closed because it has not had recent activity. Deployment will be cancelled. Thank you for your contributions.'
+            close-pr-label: 'closed'
